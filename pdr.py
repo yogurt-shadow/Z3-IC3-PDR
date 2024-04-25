@@ -34,14 +34,14 @@ class PDR(object):
         self.R.append(self.init)
 
         while(1==1):
+            # check if the last frame is inconsistent with safety
             c = self.getBadCube()
             if(c != None):
-                #print "Found bad cube:", c
                 # we have a bad cube, which we will try to block 
                 # if the cube is blocked from the previous frame 
                 # we can block it from all previous frames
                 trace = self.recBlockCube(c)
-                if trace != None:
+                if trace != None: # cannot prove unreachable
                     print("Found trace ending in bad state:")
                     for f in trace:
                         print(f)
@@ -59,24 +59,23 @@ class PDR(object):
     def checkForInduction(self):
         for frame in self.R:
             s=Solver()
-            s.add(self.trans)
-            s.add(frame)
+            s.add(self.trans) # T
+            s.add(frame) # Fi
             tmp = []
             for ele in self.primeMap:
-                # print(ele)
                 tmp.append(ele)
-            # s.add(Not(substitute(frame, self.primeMap)))
-            s.add(Not(substitute(frame, tmp)))
+            s.add(Not(substitute(frame, tmp))) # neg Fi'
             if s.check() == unsat:
-                return frame
-        return None
+                return frame # is inductive
+        return None # not inductive
 
     #loosely based on the recBlockCube method from the berkely paper, without some of the optimizations
+    # s0 is a cube {model, literal map, index of conflict frame}
     def recBlockCube(self, s0):
         Q = []
         Q.append(s0);
         while (len(Q) > 0):
-            s = Q[-1]
+            s = Q[-1] # get last Q
             if (s.t == 0):
                 # If a bad cube was not blocked all the way down to R[0]
                 # we have found a counterexample and may extract the stack trace
@@ -90,7 +89,7 @@ class PDR(object):
                 # block cube in all previous frames
                 Q.pop() #remove cube s from Q 
                 for i in range(1, s.t+1):
-                    #if not self.isBlocked(s, i):
+                    # all add the clauses (refinement)
                     self.R[i] = And(self.R[i], Not(s.cube()))
             else:
                 # Cube 's' was not blocked by image of predecessor

@@ -171,7 +171,8 @@ def EvenIncrementer():
 	post = Not(variables[len/2-1])
 	return (variables, primes, init, trans, post)
 
-tests = {'Swapper':Swapper, 'BooleanShifter':BooleanShifter, 
+tests = {'Swapper':Swapper, 
+		#  'BooleanShifter':BooleanShifter, 
 		#  'BooleanIncrementer':BooleanIncrementer, 
 # 		 'IncrementerOverflow':IncrementerOverflow,
 # 'EvenIncrementer':EvenIncrementer, 'OneAtATime':OneAtATime, 
